@@ -7,13 +7,13 @@ const App = () => {
   const [phone, setPhone] = useState("");
   const [details, setDetails] = useState([]);
 
-  const URL = "http://localhost:3001/api/persons";
+  const URL = "/api/persons";
 
   useEffect(() => {
     console.log("effect");
     axios.get(URL).then((response) => {
       // console.log("promise fulfilled");
-      // console.log(response.data);
+      console.log(response.data);
       setDetails(response.data);
     });
   }, []);
@@ -23,48 +23,49 @@ const App = () => {
     console.log("Form submitted!");
     console.log(name);
     console.log(phone);
-    const obj = { name: name, number: phone };
+    const obj = { name: name, phoneNumber: phone };
 
-    const existingDetail = details.find((detail) => {
-      return detail.name.trim() === name.trim();
-    });
+    // const existingDetail = details.find((detail) => {
+    //   return detail.name.trim() === name.trim();
+    // });
 
-    console.log("-------------", existingDetail);
-    if (existingDetail) {
-      window.confirm(`Do you want to replace ${name}?`) &&
-        axios.put(`${URL}/${existingDetail.id}`, obj).then((response) => {
-          console.log("Update called!");
-          setDetails(
-            details.map((detail) => {
-              console.log(detail.id);
-              return detail.name === name
-                ? { ...response.data }
-                : { ...detail };
-            })
-          );
-          setName("");
-          setPhone("");
+    // console.log("-------------", existingDetail);
+    // if (existingDetail) {
+    //   window.confirm(`Do you want to replace ${name}?`) &&
+    //     axios.put(`${URL}/${existingDetail.id}`, obj).then((response) => {
+    //       console.log("Update called!");
+    //       setDetails(
+    //         details.map((detail) => {
+    //           console.log(detail.id);
+    //           return detail.name === name
+    //             ? { ...response.data }
+    //             : { ...detail };
+    //         })
+    //       );
+    //       setName("");
+    //       setPhone("");
+    //     });
+    //   setName("");
+    //   setPhone("");
+    // } else {
+    try {
+      axios.post(URL, obj).then((response) => {
+        const newDetails = details.concat({
+          name: response.data.name,
+          phoneNumber: response.data.phoneNumber,
+          id: response.data._id,
         });
-      setName("");
-      setPhone("");
-    } else {
-      try {
-        axios.post(URL, obj).then((response) => {
-          const newDetails = details.concat({
-            name: response.data.name,
-            number: response.data.phone,
-            id: response.data.id,
-          });
 
-          setDetails(newDetails);
-          console.log(response.data);
-          setName("");
-          setPhone("");
-        });
-      } catch (e) {
-        console.log(e);
-      }
+        setDetails(newDetails);
+        console.log(response.data);
+        console.log(details)
+        setName("");
+        setPhone("");
+      });
+    } catch (e) {
+      console.log(e);
     }
+    // }
   };
 
   const nameChangeHandler = (e) => {
@@ -90,11 +91,13 @@ const App = () => {
       <ul>
         {details.map((obj) => {
           return (
-            <li key={obj.id}>
+            <li key={obj._id}>
               <p>
-                {obj.name} - {obj.number}
+                {obj.name} - {obj.phoneNumber}
                 &nbsp;&nbsp;
-                <button onClick={() => deleteHandler(obj.id)}>Delete</button>
+                {
+                  //<button onClick={() => deleteHandler(obj.id)}>Delete</button>
+                }
               </p>
             </li>
           );
