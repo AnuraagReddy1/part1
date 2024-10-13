@@ -15,6 +15,7 @@ const App = () => {
       // console.log("promise fulfilled");
       console.log(response.data);
       setDetails(response.data);
+      console.log("intial effect");
     });
   }, []);
 
@@ -25,47 +26,47 @@ const App = () => {
     console.log(phone);
     const obj = { name: name, phoneNumber: phone };
 
-    // const existingDetail = details.find((detail) => {
-    //   return detail.name.trim() === name.trim();
-    // });
+    const existingDetail = details.find((detail) => {
+      return detail.name.trim() === obj.name.trim();
+    });
 
-    // console.log("-------------", existingDetail);
-    // if (existingDetail) {
-    //   window.confirm(`Do you want to replace ${name}?`) &&
-    //     axios.put(`${URL}/${existingDetail.id}`, obj).then((response) => {
-    //       console.log("Update called!");
-    //       setDetails(
-    //         details.map((detail) => {
-    //           console.log(detail.id);
-    //           return detail.name === name
-    //             ? { ...response.data }
-    //             : { ...detail };
-    //         })
-    //       );
-    //       setName("");
-    //       setPhone("");
-    //     });
-    //   setName("");
-    //   setPhone("");
-    // } else {
-    try {
-      axios.post(URL, obj).then((response) => {
-        const newDetails = details.concat({
-          name: response.data.name,
-          phoneNumber: response.data.phoneNumber,
-          id: response.data._id,
+    console.log("-------------", existingDetail);
+    if (existingDetail) {
+      window.confirm(`Do you want to replace ${name}?`) &&
+        axios.put(`${URL}/${existingDetail._id}`, obj).then((response) => {
+          console.log("Update called!");
+          setDetails(
+            details.map((detail) => {
+              console.log(detail._id);
+              return detail.name === name
+                ? { ...response.data }
+                : { ...detail };
+            })
+          );
+          setName("");
+          setPhone("");
         });
+      setName("");
+      setPhone("");
+    } else {
+      try {
+        axios.post(URL, obj).then((response) => {
+          const newDetails = details.concat({
+            name: response.data.name,
+            phoneNumber: response.data.phoneNumber,
+            id: response.data._id,
+          });
 
-        setDetails(newDetails);
-        console.log(response.data);
-        console.log(details)
-        setName("");
-        setPhone("");
-      });
-    } catch (e) {
-      console.log(e);
+          setDetails(newDetails);
+          console.log(response.data);
+          console.log(details);
+          setName("");
+          setPhone("");
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
-    // }
   };
 
   const nameChangeHandler = (e) => {
@@ -83,6 +84,7 @@ const App = () => {
       axios.delete(`${URL}/${id}`).then((response) => {
         console.log(response);
         setDetails(details.filter((obj) => obj.id !== id));
+        console.log(response.data);
       });
   };
 
@@ -95,9 +97,7 @@ const App = () => {
               <p>
                 {obj.name} - {obj.phoneNumber}
                 &nbsp;&nbsp;
-                {
-                  //<button onClick={() => deleteHandler(obj.id)}>Delete</button>
-                }
+                <button onClick={() => deleteHandler(obj._id)}>Delete</button>
               </p>
             </li>
           );
